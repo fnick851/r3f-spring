@@ -1,16 +1,22 @@
 import { Canvas } from "@react-three/fiber";
 import React, { useRef, useState } from "react";
 import "./App.css";
-import { useSpring, animated, config } from "@react-spring/three";
-import { Mesh } from "three";
+import { useSpring, animated, config, SpringValue } from "@react-spring/three";
+import { Mesh, Vector3 } from "three";
 import { OrbitControls } from "@react-three/drei";
 
 function Scene() {
   const [active, setActive] = useState(false);
+  const [movedAway, setMovedAway] = useState(false);
 
   const { scale } = useSpring({
     scale: active ? 2 : 1,
     config: config.wobbly,
+  });
+
+  const { position } = useSpring<{ position: [number, number, number] }>({
+    position: movedAway ? [1, 1, 1] : [0, 0, 0],
+    config: config.molasses,
   });
 
   const meshRef = useRef<Mesh>();
@@ -18,7 +24,11 @@ function Scene() {
   return (
     <animated.mesh
       scale={scale}
-      onClick={() => setActive(!active)}
+      position={position}
+      onClick={() => {
+        setActive(!active);
+        setMovedAway(!movedAway);
+      }}
       ref={meshRef}
     >
       <coneGeometry />
